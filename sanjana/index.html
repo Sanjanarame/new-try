@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <link rel="stylesheet" type="text/css" href="styles.css" />
+        <title>Connect Metamask</title>
+    </head>
+    <body>
+        <button id="connect-button">Connect Metamask</button>
+        <script>
+            document.getElementById('connect-button').addEventListener('click', event => {
+                const button = event.target;
+
+                // Check if Ethereum provider (Metamask) is available
+                if (typeof window.ethereum === 'undefined') {
+                    alert('Metamask is not installed. Please install it to proceed.');
+                    return;
+                }
+
+                ethereum.request({ method: 'eth_requestAccounts' })
+                    .then(accounts => {
+                        const account = accounts[0];
+                        button.textContent = `Connected: ${account.slice(0, 6)}...${account.slice(-4)}`;
+                        console.log('Connected account:', account);
+
+                        return ethereum.request({
+                            method: 'eth_getBalance',
+                            params: [account, 'latest']
+                        });
+                    })
+                    .then(balanceHex => {
+                        const wei = parseInt(balanceHex, 16); // Convert balance from hex
+                        const balance = wei / 1e18; // Convert Wei to Ether
+                        console.log(`Account balance: ${balance} ETH`);
+                        alert(`Account balance: ${balance} ETH`);
+                    })
+                    .catch(err => {
+                        console.error('Error:', err);
+                        alert('An error occurred. Check the console for details.');
+                    });
+            });
+        </script>
+    </body>
+</html>
